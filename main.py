@@ -1,4 +1,4 @@
-# https://api.openweathermap.org/data/3.0/onecall/day_summary?lat={lat}&lon={lon}&date={date}&units=metric&appid={API key}
+# https://api.openweathermap.org/data/3.0/onecall/day_summary?lat={lat}&lon={lon}&date={date}&units=metric&appid={API_key}
 
 from SECRETS import API_KEY, PROXY_ADDRESS
 from flatten_json import flatten
@@ -7,15 +7,14 @@ import pandas as pd
 import datetime
 import time
 import urllib.parse
-import json
 import os
 import csv
 
 USE_PROXY: bool = False
 
 CITIES = ["Shenzhen", "Shanghai", "Guangzhou", "Beijing"]
-START_DATE = datetime.datetime(2023, 7, 1)
-END_DATE = datetime.datetime(2023, 8, 31)
+START_DATE = datetime.datetime(2024, 7, 1)
+END_DATE = datetime.datetime(2024, 7, 29)
 OUTPUT_FILE = ".\\data\\weather_data.csv"
 
 
@@ -47,6 +46,7 @@ def get_city_coordinates(city):
     response = requests.get(url)
     data = response.json()
     if data:
+        print(f"{city}: {data[0]["lat"]}, {data[0]["lon"]}")
         return data[0]["lat"], data[0]["lon"]
     else:
         print(f"*** Error: no geo-code data found for {city} ***")

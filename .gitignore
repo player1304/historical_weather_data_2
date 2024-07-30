@@ -1,6 +1,6 @@
 SECRETS.py
 *.csv
-*.xlsx
+*.zip
 data/
 
 # https://github.com/github/gitignore

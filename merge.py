@@ -101,7 +101,6 @@ def merge_csv_files(output_file):
                             row[field] = "NA"
                     writer.writerow(row)
 
-    print(f"Merged CSV file created: {temp_output_file}")
     print(f"Total number of columns: {len(all_fieldnames)}")
     print(f"Columns: {', '.join(all_fieldnames)}")
 
