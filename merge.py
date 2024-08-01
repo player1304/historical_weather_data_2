@@ -118,16 +118,19 @@ def merge_csv_files(output_file):
 
 if __name__ == "__main__":
     print(
-        "This is a helper script to aggregate all weather_date_*.csv in .\\data into a single csv."
+        " --- This is a helper script to aggregate all weather_data_*.csv in .\\data into a single csv. ---"
     )
     if os.path.exists(OUTPUT_FILE):
         response = input(
-            "The aggregated file already exists. Do you want to overwrite it? Type Y to confirm: "
+            "*** Warning: the aggregated file already exists. Do you want to overwrite it? Type Y to confirm: ***"
         )
         if response.lower() == "y":
-            os.remove(OUTPUT_FILE)
-            print("Overwriting.........")
+            base_name, extension = os.path.splitext(OUTPUT_FILE)
+            old_file = f"{base_name}_old{extension}"
+            os.rename(OUTPUT_FILE, old_file)
             merge_csv_files(OUTPUT_FILE)
+            # print("Overwriting.........")
+            os.remove(old_file)
         else:
             print("Abort.")
     else:

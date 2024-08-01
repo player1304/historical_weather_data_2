@@ -12,9 +12,10 @@ import csv
 
 USE_PROXY: bool = False
 
-CITIES = ["Shenzhen", "Shanghai", "Guangzhou", "Beijing"]
-START_DATE = datetime.datetime(2024, 7, 1)
-END_DATE = datetime.datetime(2024, 7, 29)
+# CITIES = ["Shenzhen", "Shanghai", "Guangzhou", "Beijing"]
+CITIES = ["Qingdao","Xi'an","Chengdu","Haikou","Zhengzhou"]
+START_DATE = datetime.datetime(2023, 1, 1)
+END_DATE = datetime.datetime(2023, 1, 31)
 OUTPUT_FILE = ".\\data\\weather_data.csv"
 
 
@@ -40,8 +41,10 @@ def confirm_overwrite(file_path):
 
 
 def get_city_coordinates(city):
-    """Get latitude and longitude of a city"""
-    encoded_city = urllib.parse.quote(city, safe="")
+    """Get latitude and longitude of a city. 
+    
+    ',China' will be added to the end of the city name for geo-coding purpose."""
+    encoded_city = urllib.parse.quote(city, safe="") + ",China"
     url = f"http://api.openweathermap.org/geo/1.0/direct?q={encoded_city}&limit=1&appid={API_KEY}"
     response = requests.get(url)
     data = response.json()
