@@ -12,10 +12,10 @@ import csv
 
 USE_PROXY: bool = False
 
-# CITIES = ["Shenzhen", "Shanghai", "Guangzhou", "Beijing"]
-CITIES = ["Qingdao","Xi'an","Chengdu","Haikou","Zhengzhou"]
-START_DATE = datetime.datetime(2023, 1, 1)
-END_DATE = datetime.datetime(2023, 1, 31)
+CITIES = ["Shenzhen", "Shanghai", "Guangzhou", "Beijing","Qingdao","Xi'an","Chengdu","Haikou","Zhengzhou","Nanning"]
+# CITIES = []
+START_DATE = datetime.datetime(2024, 8, 1)
+END_DATE = datetime.datetime(2024, 8, 6)
 OUTPUT_FILE = ".\\data\\weather_data.csv"
 
 

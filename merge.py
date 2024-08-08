@@ -126,11 +126,12 @@ if __name__ == "__main__":
         )
         if response.lower() == "y":
             base_name, extension = os.path.splitext(OUTPUT_FILE)
-            old_file = f"{base_name}_old{extension}"
-            os.rename(OUTPUT_FILE, old_file)
+            backup_file = f"{base_name}_backup{extension}"
+            if os.path.exists(backup_file): # just in case the backup is also present, delete the old backup
+                os.remove(backup_file) 
+            os.rename(OUTPUT_FILE, backup_file)
             merge_csv_files(OUTPUT_FILE)
             # print("Overwriting.........")
-            os.remove(old_file)
         else:
             print("Abort.")
     else:
