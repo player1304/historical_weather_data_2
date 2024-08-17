@@ -5,7 +5,7 @@ from flatten_json import flatten
 import requests
 import pandas as pd
 import datetime
-import time
+from time import sleep
 import urllib.parse
 import os
 import csv
@@ -13,11 +13,13 @@ import csv
 USE_PROXY: bool = False
 
 CITIES = ["Shenzhen", "Shanghai", "Guangzhou", "Beijing","Qingdao","Xi'an","Chengdu","Haikou","Zhengzhou","Nanning"]
-# CITIES = []
-START_DATE = datetime.datetime(2024, 8, 1)
-END_DATE = datetime.datetime(2024, 8, 6)
+# CITIES = ['Nanning']
+START_DATE = datetime.datetime(2021, 9,7)
+END_DATE = datetime.datetime(2021, 9,30)
 OUTPUT_FILE = ".\\data\\weather_data.csv"
 
+RETRY_TIMES = 10
+RETRY_DELAY = 6
 
 def append_to_csv(file_path, data, fieldnames):
     """Append a row to the CSV file"""
@@ -60,12 +62,14 @@ def get_weather_data(city, lat, lon, date_str):
     """Get weather data for a city on a specific date in the format YYYY-MM-DD"""
     url = f"https://api.openweathermap.org/data/3.0/onecall/day_summary?lat={lat}&lon={lon}&date={date_str}&units=metric&appid={API_KEY}"
 
-    if USE_PROXY == True:
-        response = requests.get(url, proxies=PROXY_ADDRESS)
-    else:
-        response = requests.get(url)
+    response = make_request_with_retry(url)
 
-    data = response.json()
+    if response.status_code == 200:
+        data = response.json()
+        # print("Log: request for {city} on {date_str} successful. Processing data...")
+    else:
+        print(f"*** Warning: Request failed after {RETRY_TIMES} attempts. Final status code: {response.status_code} ***")
+        data = response.json()
 
     # Check if response is empty
     if data:
@@ -73,11 +77,28 @@ def get_weather_data(city, lat, lon, date_str):
         # add columns for easier processing in Excel
         flattened_data["city_name"] = city
         return flattened_data
-
     else:  # data is empty
         print(f"*** Warning: No geo-coding data found for {city} on {date_str} ***")
         return None
 
+
+def make_request_with_retry(url):
+    for attempt in range(RETRY_TIMES):
+        # check if Proxy is required
+        if USE_PROXY == True:
+            response = requests.get(url, proxies=PROXY_ADDRESS)
+        else:
+            response = requests.get(url)
+
+        if response.status_code == 200:
+            return response
+        else:
+            print(f"Warning: Attempt {attempt + 1} failed. Status code: {response.status_code}")
+            if attempt < RETRY_TIMES - 1:  # Don't sleep after the last attempt
+                sleep(RETRY_DELAY)
+    
+    print(f"Warning: All {RETRY_TIMES} attempts failed.")
+    return response  # Return the last response even if it's not 200
 
 def update_csv_with_new_column(file_path, new_fieldnames):
     """In case a key is not found in the header, update the CSV file with a new column"""
@@ -164,10 +185,10 @@ def main():
                             update_csv_with_new_column(OUTPUT_FILE, fieldnames)
                             print(f"New column(s) added: {', '.join(new_fields)}")
 
-                        if missing_fields:  # Missing values, no need to worry
-                            print(
-                                f"Debug: some columns are missing: {', '.join(missing_fields)}. No need to worry."
-                            )
+                        # if missing_fields:  # Missing values, no need to worry
+                        #     print(
+                        #         f"Debug: some columns are missing: {', '.join(missing_fields)}. No need to worry."
+                        #     )
 
                     # Ensure all fieldnames are present in data
                     for field in fieldnames:
@@ -178,7 +199,7 @@ def main():
                     append_to_csv(OUTPUT_FILE, data, fieldnames)
                     print(f"Data for {city} on {date_str} appended to {OUTPUT_FILE}.")
 
-                time.sleep(1)  # To avoid hitting API rate limits
+                sleep(1)  # To avoid hitting API rate limits
 
     print(f"Data collection complete. All data saved to {OUTPUT_FILE}.")
 

@@ -129,6 +129,7 @@ if __name__ == "__main__":
             backup_file = f"{base_name}_backup{extension}"
             if os.path.exists(backup_file): # just in case the backup is also present, delete the old backup
                 os.remove(backup_file) 
+                print("Old backup file deleted.")
             os.rename(OUTPUT_FILE, backup_file)
             merge_csv_files(OUTPUT_FILE)
             # print("Overwriting.........")
